@@ -1,0 +1,100 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v1"
+    },
+    "exported_at": "2020-12-13T00:04:28-07:00",
+    "name": "Custom HLDS Engine Game",
+    "author": "parker@parkervcp.com",
+    "description": "This option allows modifying the startup arguments and other details to run a custom HLDS based game on the panel.",
+    "features": null,
+    "image": "quay.io\/pterodactyl\/core:source",
+    "startup": ".\/hlds_run -console -game {{HLDS_GAME}} -port {{SERVER_PORT}} -sport {{VAC_PORT}} -maxplayers {{MAX_PLAYERS}} +map {{HLDS_MAP}} -sys_ticrate {{TICKRATE}} -pingboost 2 -timeout {{TIMEOUT}} +ip 0.0.0.0 -strictportbind -norestart -dll addons\/metamod\/dlls\/metamod.so",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"Connection to Steam servers successful\",\r\n    \"userInteraction\": []\r\n}",
+        "logs": "{\r\n    \"custom\": true,\r\n    \"location\": \"logs\/latest.log\"\r\n}",
+        "stop": "quit"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\n# steamcmd Base Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\n# Image to install with is 'debian:buster-slim'\r\n\r\n##\r\n#\r\n# Variables\r\n# HLDS_GAME - HLDS server game found here - https:\/\/developer.valvesoftware.com\/wiki\/Dedicated_Server_Name_Enumeration\r\n#\r\n##\r\n\r\napt -y update\r\napt -y --no-install-recommends install curl lib32gcc1 ca-certificates wget xz-utils\r\n\r\n## download and install steamcmd\r\ncd \/tmp\r\nmkdir -p \/mnt\/server\/steamcmd\r\ncurl -sSL -o steamcmd.tar.gz https:\/\/steamcdn-a.akamaihd.net\/client\/installer\/steamcmd_linux.tar.gz\r\ntar -xzvf steamcmd.tar.gz -C \/mnt\/server\/steamcmd\r\ncd \/mnt\/server\/steamcmd\r\n\r\n# SteamCMD fails otherwise for some reason, even running as root.\r\n# This is changed at the end of the install process anyways.\r\nchown -R root:root \/mnt\r\nexport HOME=\/mnt\/server\r\n\r\n## install game using steamcmd\r\n.\/steamcmd.sh +login anonymous +force_install_dir \/mnt\/server +app_update ${HLDS_APPID} +app_set_config 90 mod ${HLDS_GAME} +quit ## other flags may be needed depending on install.\r\n\r\n## set up 32 bit libraries\r\nmkdir -p \/mnt\/server\/.steam\/sdk32\r\ncp -v linux32\/steamclient.so ..\/.steam\/sdk32\/steamclient.so\r\n\r\n## for fastdl add read and execute permissions to group\r\nchmod 750 \/mnt\/server\/\r\n\r\n\r\n\r\n\r\n\r\n## SCS\r\n# Download and extract Metamod-P 1.21p38 in server\r\nmkdir -p \/mnt\/server\/$HLDS_GAME\/addons\/metamod\/dlls\/\r\ncd \/mnt\/server\/$HLDS_GAME\/addons\/metamod\/dlls\/\r\nmetamodP=\"metamod_i686_linux_win32-1.21p38.tar.xz\";\r\nwget https:\/\/github.com\/Bots-United\/metamod-p\/releases\/download\/v1.21p38\/$metamodP\r\ntar -xvf $metamodP\r\nrm -f $metamodP\r\nrm -f metamod.dll\r\n\r\n\r\n\r\n# Download and extract Last AMX Mod X 1.9 Base\r\nmkdir -p \/mnt\/server\/$HLDS_GAME\/\r\ncd \/mnt\/server\/$HLDS_GAME\/\r\namxxBase=\"https:\/\/www.amxmodx.org\/amxxdrop\/1.9\/$(curl -L https:\/\/www.amxmodx.org\/amxxdrop\/1.9\/amxmodx-latest-base-linux)\";\r\nwget $amxxBase -O - | tar -xzvf -\r\n\r\n# Enable Amx Mod x 1.9\r\necho 'linux addons\/amxmodx\/dlls\/amxmodx_mm_i386.so' > \/mnt\/server\/$HLDS_GAME\/addons\/metamod\/plugins.ini\r\n\r\n\r\n## If hlds game is cstrike\r\nif [ $HLDS_GAME = \"cstrike\" ]; then\r\n    # Download and extract Last AMX Mod X 1.9 Counter-Strike\r\n    mkdir -p \/mnt\/server\/$HLDS_GAME\/\r\n    cd \/mnt\/server\/$HLDS_GAME\/\r\n    amxxGame=\"https:\/\/www.amxmodx.org\/amxxdrop\/1.9\/$(curl -L https:\/\/www.amxmodx.org\/amxxdrop\/1.9\/amxmodx-latest-$HLDS_GAME-linux)\";\r\n    wget $amxxGame -O - | tar -xzvf -\r\nfi\r\n\r\n\r\n\r\n# Delete wget history\r\nrm -f \/mnt\/server\/.wget-hsts",
+            "container": "debian:buster-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Game ID",
+            "description": "The ID corresponding to the game to download and run using HLDS.\r\n\r\nThe HLDS server ID is 90. This should not be changed.",
+            "env_variable": "HLDS_APPID",
+            "default_value": "90",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "required|numeric|digits_between:1,6"
+        },
+        {
+            "name": "Game Name",
+            "description": "The name corresponding to the game to download and run using HLDS.\r\n\r\nall the HLDS server names are here - https:\/\/developer.valvesoftware.com\/wiki\/Dedicated_Server_Name_Enumeration",
+            "env_variable": "HLDS_GAME",
+            "default_value": "cstrike",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "required|alpha_dash|between:1,100"
+        },
+        {
+            "name": "VAC port",
+            "description": "Specifies the VAC port the server should use. Default is 26900.",
+            "env_variable": "VAC_PORT",
+            "default_value": "26900",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|numeric|digits_between:1,5"
+        },
+        {
+            "name": "Max Players",
+            "description": "Maximum number of players on the server.",
+            "env_variable": "MAX_PLAYERS",
+            "default_value": "20",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "required|numeric|between:1,32"
+        },
+        {
+            "name": "Map",
+            "description": "The default map for the server.",
+            "env_variable": "HLDS_MAP",
+            "default_value": "de_dust2",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|alpha_dash"
+        },
+        {
+            "name": "Tickrate",
+            "description": "A higher tickrate increases the simulation precision, but also requires more CPU power and available bandwidth on both server and client.",
+            "env_variable": "TICKRATE",
+            "default_value": "350",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "required|numeric|between:100,1000"
+        },
+        {
+            "name": "Timeout",
+            "description": "Time in seconds to wait to restart server after a crash.",
+            "env_variable": "TIMEOUT",
+            "default_value": "10",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric|between:10,60"
+        },
+        {
+            "name": "Fast Download",
+            "description": "",
+            "env_variable": "FAST_DOWNLOAD",
+            "default_value": "https:\/\/miamiX.serverscstrike.com\/UUID\/cstrike\/",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "string"
+        }
+    ]
+}

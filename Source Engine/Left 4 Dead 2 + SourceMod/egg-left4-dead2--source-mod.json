@@ -1,0 +1,91 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v1"
+    },
+    "exported_at": "2020-12-12T23:55:16-07:00",
+    "name": "Left 4 Dead 2 + SourceMod",
+    "author": "sinaloensemel@gmail.com",
+    "description": "This option allows modifying the startup arguments and other details to run a Left 4 Dead 2 server on the panel.",
+    "features": null,
+    "image": "quay.io\/pterodactyl\/core:source",
+    "startup": ".\/srcds_run -game {{SRCDS_GAME}} -console -port {{SERVER_PORT}} +map {{SRCDS_MAP}} -tickrate {{TICKRATE}} -sv_clockcorrection_msecs {{CLOCKCORRECTION}} -timeout {{TIMEOUT}} +ip 0.0.0.0 -strictportbind",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"Connection to Steam servers successful\",\r\n    \"userInteraction\": []\r\n}",
+        "logs": "{\r\n    \"custom\": true,\r\n    \"location\": \"logs\/latest.log\"\r\n}",
+        "stop": "quit"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\n# steamcmd Base Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\n# Image to install with is 'debian:buster-slim'\r\n\r\n##\r\n#\r\n# Variables\r\n# STEAM_USER, STEAM_PASS, STEAM_AUTH - Steam user setup. If a user has 2fa enabled it will most likely fail due to timeout. Leave blank for anon install.\r\n# WINDOWS_INSTALL - if it's a windows server you want to install set to 1\r\n# SRCDS_APPID - steam app id found here - https:\/\/developer.valvesoftware.com\/wiki\/Dedicated_Servers_List\r\n# EXTRA_FLAGS - when a server has extra glas for things like beta installs or updates.\r\n# SRCDS_GAME - SRCDS server game found here - https:\/\/developer.valvesoftware.com\/wiki\/Dedicated_Server_Name_Enumeration\r\n#\r\n##\r\n\r\napt -y update\r\napt -y --no-install-recommends install curl lib32gcc1 ca-certificates wget\r\n\r\n## just in case someone removed the defaults.\r\nif [ \"${STEAM_USER}\" == \"\" ]; then\r\n    echo -e \"steam user is not set.\\n\"\r\n    echo -e \"Using anonymous user.\\n\"\r\n    STEAM_USER=anonymous\r\n    STEAM_PASS=\"\"\r\n    STEAM_AUTH=\"\"\r\nelse\r\n    echo -e \"user set to ${STEAM_USER}\"\r\nfi\r\n\r\n## download and install steamcmd\r\ncd \/tmp\r\nmkdir -p \/mnt\/server\/steamcmd\r\ncurl -sSL -o steamcmd.tar.gz https:\/\/steamcdn-a.akamaihd.net\/client\/installer\/steamcmd_linux.tar.gz\r\ntar -xzvf steamcmd.tar.gz -C \/mnt\/server\/steamcmd\r\ncd \/mnt\/server\/steamcmd\r\n\r\n# SteamCMD fails otherwise for some reason, even running as root.\r\n# This is changed at the end of the install process anyways.\r\nchown -R root:root \/mnt\r\nexport HOME=\/mnt\/server\r\n\r\n## install game using steamcmd\r\n.\/steamcmd.sh +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} $( [[ \"${WINDOWS_INSTALL}\" == \"1\" ]] && printf %s '+@sSteamCmdForcePlatformType windows' ) +force_install_dir \/mnt\/server +app_update ${SRCDS_APPID} ${EXTRA_FLAGS} validate +quit ## other flags may be needed depending on install. looking at you cs 1.6\r\n\r\n## set up 32 bit libraries\r\nmkdir -p \/mnt\/server\/.steam\/sdk32\r\ncp -v linux32\/steamclient.so ..\/.steam\/sdk32\/steamclient.so\r\n\r\n## set up 64 bit libraries\r\nmkdir -p \/mnt\/server\/.steam\/sdk64\r\ncp -v linux64\/steamclient.so ..\/.steam\/sdk64\/steamclient.so\r\n\r\n## for fastdl add read and execute permissions to group\r\nchmod 750 \/mnt\/server\/\r\n\r\n\r\n\r\n\r\n\r\n## SCS\r\n# Download and extract Metamod:Source in server\r\nmkdir -p \/mnt\/server\/$SRCDS_GAME\/\r\ncd \/mnt\/server\/$SRCDS_GAME\/\r\nmetamod=\"https:\/\/mms.alliedmods.net\/mmsdrop\/1.11\/$(curl -L https:\/\/mms.alliedmods.net\/mmsdrop\/1.11\/mmsource-latest-linux)\";\r\nwget $metamod -O - | tar -xzvf -\r\n\r\n\r\n\r\n# Download and extract Last SourceMod\r\nmkdir -p \/mnt\/server\/$SRCDS_GAME\/\r\ncd \/mnt\/server\/$SRCDS_GAME\/\r\nsourceMod=\"https:\/\/sm.alliedmods.net\/smdrop\/1.10\/$(curl -L https:\/\/sm.alliedmods.net\/smdrop\/1.10\/sourcemod-latest-linux)\";\r\nwget $sourceMod -O - | tar -xzvf -",
+            "container": "debian:buster-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Game ID",
+            "description": "The ID corresponding to the game to download.",
+            "env_variable": "SRCDS_APPID",
+            "default_value": "222860",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|numeric|digits_between:1,6"
+        },
+        {
+            "name": "Game Name",
+            "description": "The name corresponding to the game to run using SRCDS.",
+            "env_variable": "SRCDS_GAME",
+            "default_value": "left4dead2",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "required|alpha_dash|between:1,100"
+        },
+        {
+            "name": "Map",
+            "description": "The default map for the server.",
+            "env_variable": "SRCDS_MAP",
+            "default_value": "c2m1_highway",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|alpha_dash"
+        },
+        {
+            "name": "Tickrate",
+            "description": "A higher tickrate increases the simulation precision, but also requires more CPU power and available bandwidth on both server and client.",
+            "env_variable": "TICKRATE",
+            "default_value": "100",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric|between:30,128"
+        },
+        {
+            "name": "Clock Correction",
+            "description": "Used for ping variance correction.",
+            "env_variable": "CLOCKCORRECTION",
+            "default_value": "25",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric|between:0,30"
+        },
+        {
+            "name": "Timeout",
+            "description": "Time in seconds to wait to restart server after a crash.",
+            "env_variable": "TIMEOUT",
+            "default_value": "10",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric|between:10,60"
+        },
+        {
+            "name": "Fast Download",
+            "description": "",
+            "env_variable": "FAST_DOWNLOAD",
+            "default_value": "https:\/\/miamiX.serverscstrike.com\/UUID\/left4dead2\/",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "string"
+        }
+    ]
+}
