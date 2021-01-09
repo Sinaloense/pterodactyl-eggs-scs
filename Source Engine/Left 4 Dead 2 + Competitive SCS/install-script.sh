@@ -69,7 +69,7 @@ echo "Downloading https://github.com/SirPlease/L4D2-Competitive-Rework.git..."
 git clone https://github.com/SirPlease/L4D2-Competitive-Rework.git
 # Specific version https://github.com/SirPlease/L4D2-Competitive-Rework/commit/
 cd L4D2-Competitive-Rework/
-git checkout e8fca1d2fcb09eb32eca5520286517758481db83
+git checkout ab54ab82e3775a3f13ad5247bf99912ea1dda057
 cd /mnt/server/ZtMCQm/
 
 # Download left-4-dead-2-competitive-scs
@@ -77,7 +77,7 @@ echo "Downloading https://github.com/Sinaloense/left-4-dead-2-competitive-scs.gi
 git clone https://github.com/Sinaloense/left-4-dead-2-competitive-scs.git
 # Specific version https://github.com/Sinaloense/left-4-dead-2-competitive-scs/commit/
 cd left-4-dead-2-competitive-scs/
-git checkout 1568d7b975a27f9298b654ababc17635b45860e1
+git checkout d09a09787ce196328a8e15255cf07b48a6270b76
 cd /mnt/server/ZtMCQm/
 
 # Merge configs
@@ -94,10 +94,14 @@ mkdir -p backup/addons-mapas-custom/
 mv /mnt/server/left4dead2/addons/*.vpk backup/addons-mapas-custom/
 mv /mnt/server/left4dead2/addons/readme.txt backup/addons-mapas-custom/
 
-# Backup cfgs sourcebans
-mkdir -p backup/addons-sourcebans/sourcemod/configs/sourcebans/
-mv /mnt/server/left4dead2/addons/sourcemod/configs/databases.cfg backup/addons-sourcebans/sourcemod/configs/
-mv /mnt/server/left4dead2/addons/sourcemod/configs/sourcebans/sourcebans.cfg backup/addons-sourcebans/sourcemod/configs/sourcebans/
+# Backup addons cfgs
+mkdir -p backup/addons-cfg/sourcemod/configs/sourcebans/
+mv /mnt/server/left4dead2/addons/sourcemod/configs/databases.cfg backup/addons-cfg/sourcemod/configs/
+mv /mnt/server/left4dead2/addons/sourcemod/configs/sourcebans/sourcebans.cfg backup/addons-cfg/sourcemod/configs/sourcebans/
+
+mv /mnt/server/left4dead2/addons/sourcemod/configs/hextags.cfg backup/addons-cfg/sourcemod/configs/
+
+mv /mnt/server/left4dead2/addons/sourcemod/configs/advertisements.txt backup/addons-cfg/sourcemod/configs/
 
 # Backup cfgs
 mkdir -p backup/cfg/sourcemod/
@@ -131,8 +135,8 @@ yes | cp -avr competitive/* /mnt/server/left4dead2/
 # Put backup maps in server
 mv backup/addons-mapas-custom/* /mnt/server/left4dead2/addons/
 
-# Put backup cfgs sourcebans in server
-yes | cp -avr backup/addons-sourcebans/* /mnt/server/left4dead2/addons/
+# Backup addons cfgs
+yes | cp -avr backup/addons-cfg/* /mnt/server/left4dead2/addons/
 
 # Put backup cfgs in server
 yes | cp -avr backup/cfg/* /mnt/server/left4dead2/cfg/
