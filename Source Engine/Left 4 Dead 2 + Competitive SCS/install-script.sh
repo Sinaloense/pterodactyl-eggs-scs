@@ -69,7 +69,7 @@ echo "Downloading https://github.com/SirPlease/L4D2-Competitive-Rework.git..."
 git clone https://github.com/SirPlease/L4D2-Competitive-Rework.git
 # Specific version https://github.com/SirPlease/L4D2-Competitive-Rework/commit/
 cd L4D2-Competitive-Rework/
-git checkout ab54ab82e3775a3f13ad5247bf99912ea1dda057
+git checkout 7ffb1a4deacdfcf86999dc988c39baddad819c7e
 cd /mnt/server/ZtMCQm/
 
 # Download left-4-dead-2-competitive-scs
@@ -77,7 +77,7 @@ echo "Downloading https://github.com/Sinaloense/left-4-dead-2-competitive-scs.gi
 git clone https://github.com/Sinaloense/left-4-dead-2-competitive-scs.git
 # Specific version https://github.com/Sinaloense/left-4-dead-2-competitive-scs/commit/
 cd left-4-dead-2-competitive-scs/
-git checkout d09a09787ce196328a8e15255cf07b48a6270b76
+git checkout 9c039c9ec60ab82c3e906e3a852eecd5a4a738ac
 cd /mnt/server/ZtMCQm/
 
 # Merge configs
@@ -112,7 +112,8 @@ mv /mnt/server/left4dead2/cfg/sourcemod/* backup/cfg/sourcemod/
 mkdir -p backup/addons-logs/sourcemod/logs/
 mv /mnt/server/left4dead2/addons/sourcemod/logs/* backup/addons-logs/sourcemod/logs/
 
-# Backup mymotd.txt
+# Backup motd.txt, mymotd.txt
+mv /mnt/server/left4dead2/motd.txt backup/
 mv /mnt/server/left4dead2/mymotd.txt backup/
 
 
@@ -144,7 +145,8 @@ yes | cp -avr backup/cfg/* /mnt/server/left4dead2/cfg/
 # Put backup logs in server
 mv backup/addons-logs/sourcemod/logs/ /mnt/server/left4dead2/addons/sourcemod/
 
-# Put backup mymotd.txt in server
+# Put backup motd.txt, mymotd.txt in server
+yes | cp -avr backup/motd.txt /mnt/server/left4dead2/
 yes | cp -avr backup/mymotd.txt /mnt/server/left4dead2/
 
 # Delete tmp folder
