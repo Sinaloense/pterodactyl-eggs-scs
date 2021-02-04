@@ -73,3 +73,21 @@ mkdir -p /mnt/server/$SRCDS_GAME/
 cd /mnt/server/$SRCDS_GAME/
 sourceMod="https://sm.alliedmods.net/smdrop/1.10/$(curl -L https://sm.alliedmods.net/smdrop/1.10/sourcemod-latest-linux)";
 wget $sourceMod -O - | tar -xzvf -
+
+
+
+# Download configs in a tmp folder
+mkdir -p /mnt/server/ZtMCQm/
+rm -Rf /mnt/server/ZtMCQm/*
+cd /mnt/server/ZtMCQm/
+
+# Download left-4-dead-2-scs
+echo "Downloading https://github.com/Sinaloense/left-4-dead-2-scs.git"
+git clone https://github.com/Sinaloense/left-4-dead-2-scs.git
+# Specific version https://github.com/Sinaloense/left-4-dead-2-scs/commit/
+cd left-4-dead-2-scs/
+git checkout 934eb61d60b7b57f8c1c222f88e14acc02909dd4
+cd /mnt/server/ZtMCQm/
+
+# Put config in server
+yes | cp -avr left-4-dead-2-scs/* /mnt/server/left4dead2/
