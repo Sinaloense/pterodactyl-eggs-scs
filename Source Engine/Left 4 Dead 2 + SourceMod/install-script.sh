@@ -16,7 +16,7 @@
 ##
 
 apt -y update
-apt -y --no-install-recommends install curl lib32gcc1 ca-certificates wget
+apt -y --no-install-recommends install curl lib32gcc1 ca-certificates wget unzip git
 
 ## just in case someone removed the defaults.
 if [ "${STEAM_USER}" == "" ]; then
@@ -79,6 +79,17 @@ wget $sourceMod -O - | tar -xzvf -
 # Download configs in a tmp folder
 mkdir -p /mnt/server/ZtMCQm/
 rm -Rf /mnt/server/ZtMCQm/*
+cd /mnt/server/ZtMCQm/
+
+# Download and extract packets-enviroment-variables in a tmp folder: https://steamcommunity.com/discussions/forum/14/2974028351344359625/
+mkdir -p /mnt/server/ZtMCQm/packets-enviroment-variables/
+cd /mnt/server/ZtMCQm/packets-enviroment-variables/
+wget 'https://drive.google.com/uc?export=download&id=1Uk0FTu6rkj_TaxWwBAfyyWB9vJG1xqUJ' -O packets-enviroment-variables.zip
+unzip *.zip
+rm -Rf /mnt/server/ZtMCQm/packets-enviroment-variables/*.zip
+# Add packets-enviroment-variables to server
+chmod -R 755 *
+yes | cp -avr /mnt/server/ZtMCQm/packets-enviroment-variables/* /mnt/server/
 cd /mnt/server/ZtMCQm/
 
 # Download left-4-dead-2-scs

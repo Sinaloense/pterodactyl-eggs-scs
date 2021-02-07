@@ -15,7 +15,7 @@
 ##
 
 apt -y update
-apt -y --no-install-recommends install curl lib32gcc1 ca-certificates git
+apt -y --no-install-recommends install curl lib32gcc1 ca-certificates wget unzip git
 
 ## just in case someone removed the defaults.
 if [ "${STEAM_USER}" == "" ]; then
@@ -64,12 +64,23 @@ mkdir -p /mnt/server/ZtMCQm/
 rm -Rf /mnt/server/ZtMCQm/*
 cd /mnt/server/ZtMCQm/
 
+# Download and extract packets-enviroment-variables in a tmp folder: https://steamcommunity.com/discussions/forum/14/2974028351344359625/
+mkdir -p /mnt/server/ZtMCQm/packets-enviroment-variables/
+cd /mnt/server/ZtMCQm/packets-enviroment-variables/
+wget 'https://drive.google.com/uc?export=download&id=1Uk0FTu6rkj_TaxWwBAfyyWB9vJG1xqUJ' -O packets-enviroment-variables.zip
+unzip *.zip
+rm -Rf /mnt/server/ZtMCQm/packets-enviroment-variables/*.zip
+# Add packets-enviroment-variables to server
+chmod -R 755 *
+yes | cp -avr /mnt/server/ZtMCQm/packets-enviroment-variables/* /mnt/server/
+cd /mnt/server/ZtMCQm/
+
 # Download L4D2-Competitive-Rework
 echo "Downloading https://github.com/SirPlease/L4D2-Competitive-Rework.git..."
 git clone https://github.com/SirPlease/L4D2-Competitive-Rework.git
 # Specific version https://github.com/SirPlease/L4D2-Competitive-Rework/commit/
 cd L4D2-Competitive-Rework/
-git checkout 7ffb1a4deacdfcf86999dc988c39baddad819c7e
+git checkout 0d3d928cb13bb5dd2a499732bf19d99bad294c7b
 cd /mnt/server/ZtMCQm/
 
 # Download left-4-dead-2-competitive-scs
@@ -77,7 +88,7 @@ echo "Downloading https://github.com/Sinaloense/left-4-dead-2-competitive-scs.gi
 git clone https://github.com/Sinaloense/left-4-dead-2-competitive-scs.git
 # Specific version https://github.com/Sinaloense/left-4-dead-2-competitive-scs/commit/
 cd left-4-dead-2-competitive-scs/
-git checkout 9c039c9ec60ab82c3e906e3a852eecd5a4a738ac
+git checkout 446510ed49e1e18545af629aca12aa5653e57499
 cd /mnt/server/ZtMCQm/
 
 # Merge configs
