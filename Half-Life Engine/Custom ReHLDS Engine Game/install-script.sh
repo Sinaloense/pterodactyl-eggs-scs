@@ -71,6 +71,15 @@ if [ $HLDS_GAME = "cstrike" ]; then
     # Add ReGameDLL_CS to server
     chmod -R 755 *
     yes | cp -avr bin/linux32/* /mnt/server/
+
+    # Download and extract zBot in a tmp folder
+    mkdir -p /mnt/server/ZtMCQm/regamedll-cs/zBot/
+    cd /mnt/server/ZtMCQm/regamedll-cs/zBot/
+    wget https://github.com/s1lentq/ReGameDLL_CS/raw/master/regamedll/extra/zBot/bot_profiles.zip
+    unzip bot_profiles.zip
+
+    # Add zBot to server
+    yes | cp -avr * /mnt/server/
 fi
 
 

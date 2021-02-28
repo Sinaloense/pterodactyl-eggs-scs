@@ -80,7 +80,7 @@ echo "Downloading https://github.com/SirPlease/L4D2-Competitive-Rework.git..."
 git clone https://github.com/SirPlease/L4D2-Competitive-Rework.git
 # Specific version https://github.com/SirPlease/L4D2-Competitive-Rework/commit/
 cd L4D2-Competitive-Rework/
-git checkout 0d3d928cb13bb5dd2a499732bf19d99bad294c7b
+git checkout aa98990cffd452fc630e340a0e20bdf1338030b8
 cd /mnt/server/ZtMCQm/
 
 # Download left-4-dead-2-competitive-scs
@@ -88,7 +88,7 @@ echo "Downloading https://github.com/Sinaloense/left-4-dead-2-competitive-scs.gi
 git clone https://github.com/Sinaloense/left-4-dead-2-competitive-scs.git
 # Specific version https://github.com/Sinaloense/left-4-dead-2-competitive-scs/commit/
 cd left-4-dead-2-competitive-scs/
-git checkout 446510ed49e1e18545af629aca12aa5653e57499
+git checkout 56770e781da7862f622ec556e076c5608490d9b8
 cd /mnt/server/ZtMCQm/
 
 # Merge configs

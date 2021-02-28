@@ -1,0 +1,41 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v1",
+        "update_url": null
+    },
+    "exported_at": "2021-02-15T16:25:44-07:00",
+    "name": "Custom ReHLDS HLTV",
+    "author": "sinaloensemel@gmail.com",
+    "description": "This option allows modifying the startup arguments and other details to run a custom ReHLDS based game on the panel.",
+    "features": null,
+    "images": [
+        "quay.io\/pterodactyl\/core:source"
+    ],
+    "file_denylist": "",
+    "startup": ".\/hltv_run -console -port {{SERVER_PORT}}  -maxclients {{MAX_CLIENTS}} +ip 0.0.0.0 -strictportbind +exec hltv.cfg",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"Type 'help' for a list of commands.\",\r\n    \"userInteraction\": []\r\n}",
+        "logs": "{\r\n    \"custom\": true,\r\n    \"location\": \"logs\/latest.log\"\r\n}",
+        "stop": "quit"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\n# steamcmd Base Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\n# Image to install with is 'debian:buster-slim'\r\n\r\n##\r\n#\r\n# Variables\r\n# HLDS_GAME - HLDS server game found here - https:\/\/developer.valvesoftware.com\/wiki\/Dedicated_Server_Name_Enumeration\r\n#\r\n##\r\n\r\napt -y update\r\napt -y --no-install-recommends install curl lib32gcc1 ca-certificates wget xz-utils unzip\r\n\r\n## download and install steamcmd\r\ncd \/tmp\r\nmkdir -p \/mnt\/server\/steamcmd\r\ncurl -sSL -o steamcmd.tar.gz https:\/\/steamcdn-a.akamaihd.net\/client\/installer\/steamcmd_linux.tar.gz\r\ntar -xzvf steamcmd.tar.gz -C \/mnt\/server\/steamcmd\r\ncd \/mnt\/server\/steamcmd\r\n\r\n# SteamCMD fails otherwise for some reason, even running as root.\r\n# This is changed at the end of the install process anyways.\r\nchown -R root:root \/mnt\r\nexport HOME=\/mnt\/server\r\n\r\n## install game using steamcmd\r\n.\/steamcmd.sh +login anonymous +force_install_dir \/mnt\/server +app_update 90 +app_set_config 90 mod valve +quit ## other flags may be needed depending on install.\r\n\r\n## set up 32 bit libraries\r\nmkdir -p \/mnt\/server\/.steam\/sdk32\r\ncp -v linux32\/steamclient.so ..\/.steam\/sdk32\/steamclient.so\r\n\r\n## for fastdl add read and execute permissions to group\r\nchmod 750 \/mnt\/server\/\r\n\r\n# hltv_run\r\necho '#!\/bin\/bash\r\nexport LD_LIBRARY_PATH=\".:$LD_LIBRARY_PATH\"\r\nif test -e \"hltv\"; then\r\n\tif test -x \"hltv\"; then\r\n\t\t.\/hltv $@\r\n\telse\r\n\t\techo \"hltv: binary not executable.\"\r\n\tfi\r\nelse\r\n\techo \"hltv: file not found.\"\r\nfi' > \/mnt\/server\/hltv_run\r\nchmod +x \/mnt\/server\/hltv_run\r\n\r\n# hltv.cfg\r\necho 'name \"HLTV\"\r\nhostname \"HLTV\"\r\nofflinetext \"Sorry, game is delayed. Please try again later.\"\r\ndelay 60.0\r\nmaxrate 3500\r\nchatmode 1\r\nserverpassword \"\"\r\nadminpassword \"\"\r\nloopcmd 1 60 localmsg \"You&apos;re watching HLTV. Visit www.valvesoftware.com\" 5 -1 0.85 FFA000FF\r\nsignoncommands \"voice_scale 2; voice_overdrive 16; volume 0.5; echo Voice adjusted for HLTV\"\r\n\r\n#connect IP:PORT' > \/mnt\/server\/hltv.cfg\r\n\r\n\r\n\r\n\r\n## SCS\r\n# Create empty tmp folder\r\nmkdir -p \/mnt\/server\/ZtMCQm\/\r\nrm -Rf \/mnt\/server\/ZtMCQm\/*\r\ncd \/mnt\/server\/ZtMCQm\/\r\n\r\n\r\n\r\n# Download and extract ReHLDS in a tmp folder\r\nmkdir -p \/mnt\/server\/ZtMCQm\/rehlds\/\r\ncd \/mnt\/server\/ZtMCQm\/rehlds\/\r\ncurl -Ls https:\/\/api.github.com\/repos\/dreamstalker\/rehlds\/releases\/latest | grep -wo \"https.*.zip\" | wget -qi -\r\nunzip *.zip bin\/linux32\/* -d \/mnt\/server\/ZtMCQm\/rehlds\/\r\n\r\n# Add ReHLDS to server\r\nchmod -R 755 *\r\nyes | cp -avr bin\/linux32\/* \/mnt\/server\/\r\n\r\n\r\n\r\n# Delete wget history\r\nrm -f \/mnt\/server\/.wget-hsts\r\n\r\n# Delete tmp folder\r\ncd \/mnt\/server\/\r\nrm -Rf ZtMCQm\/",
+            "container": "debian:buster-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Max Clients",
+            "description": "Maximum number of clinets on the server.",
+            "env_variable": "MAX_CLIENTS",
+            "default_value": "128",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "required|numeric|between:1,128"
+        }
+    ]
+}
